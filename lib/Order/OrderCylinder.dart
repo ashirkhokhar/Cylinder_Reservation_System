@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Quantity.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class OrderCylinder extends StatefulWidget {
   const OrderCylinder({Key? key}) : super(key: key);
@@ -18,7 +19,14 @@ class _OrderCylinderState extends State<OrderCylinder> {
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         backgroundColor: Colors.deepPurple[300],
-        title: const Text('Order Cylinder'),
+        title: Text("Order Cylinder",
+            style: GoogleFonts.bebasNeue(fontSize: 30, color: Colors.white)),
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(30),
+        )),
       ),
       body: Stack(
         children: [

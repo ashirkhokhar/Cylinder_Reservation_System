@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Order/OrderCylinder.dart';
+import 'package:flutter_application_1/Details/OrderTable.dart';
+import 'package:flutter_application_1/Details/order_provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+
+import 'order_model.dart';
 
 class DetailsPage extends StatelessWidget {
   final String selectedLocation;
@@ -8,6 +13,7 @@ class DetailsPage extends StatelessWidget {
   final String sector;
   final String street;
   final String houseNo;
+  final String phoneNumber;
 
   DetailsPage({
     required this.selectedLocation,
@@ -16,16 +22,24 @@ class DetailsPage extends StatelessWidget {
     required this.sector,
     required this.street,
     required this.houseNo,
-    required String phoneNumber,
+    required this.phoneNumber,
   });
 
   @override
   Widget build(BuildContext context) {
+    final orderProvider = Provider.of<OrderProvider>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Colors.deepPurple[300],
-        title: const Text('Order Details'),
+        title: Text("Selected Credenstials",
+            style: GoogleFonts.bebasNeue(fontSize: 30, color: Colors.white)),
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(30),
+        )),
       ),
       body: Center(
         child: ListView(
@@ -43,10 +57,6 @@ class DetailsPage extends StatelessWidget {
               title: const Text('Quantity'),
               subtitle: Text(selectedQuantity),
             ),
-            // ListTile(
-            //   title: Text('Cylinder Size'),
-            //   subtitle: Text(cylinderSize),
-            // ),
             ListTile(
               title: const Text('Sector'),
               subtitle: Text(sector),
@@ -64,10 +74,28 @@ class DetailsPage extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 25),
               child: GestureDetector(
                 onTap: () {
-                  // Show a snackbar to indicate that the order has been placed
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Your order has been placed!'),
+                  orderProvider.addOrder(OrderData(
+                    selectedLocation: selectedLocation,
+                    selectedCylinder: selectedCylinder,
+                    selectedQuantity:
+                        selectedQuantity, // Make sure you have this field
+                    sector: sector, // Make sure you have this field
+                    houseNo: houseNo, // Make sure you have this field
+                    street: street, // Make sure you have this field
+                    phoneNumber: phoneNumber,
+                  ));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Ordertable(
+                        selectedLocation: selectedLocation,
+                        selectedCylinder: selectedCylinder,
+                        selectedQuantity: selectedQuantity,
+                        phoneNumber: phoneNumber,
+                        sector: sector,
+                        houseno: houseNo,
+                        street: street,
+                      ),
                     ),
                   );
                 },
@@ -78,7 +106,7 @@ class DetailsPage extends StatelessWidget {
                     color: Colors.deepPurple[300],
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'Ok',
                       style: TextStyle(

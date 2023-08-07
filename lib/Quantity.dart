@@ -1,8 +1,7 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Details/OrderDetails.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_1/Order/orderplace.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Quantity extends StatefulWidget {
   const Quantity({Key? key, required this.selectedCylinder}) : super(key: key);
@@ -25,7 +24,14 @@ class _QuantityState extends State<Quantity> {
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         backgroundColor: Colors.deepPurple[300],
-        title: const Text('Quantity'),
+        title: Text("Quantity",
+            style: GoogleFonts.bebasNeue(fontSize: 30, color: Colors.white)),
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(30),
+        )),
       ),
       body: Stack(
         children: [
@@ -104,7 +110,6 @@ class _QuantityState extends State<Quantity> {
                         _isLoading = true; // Show circular progress indicator
                       });
 
-                      // Simulate a delay to demonstrate the loading state
                       await Future.delayed(Duration(seconds: 2));
 
                       Navigator.push(

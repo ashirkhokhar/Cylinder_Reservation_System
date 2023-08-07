@@ -1,7 +1,11 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Details/OrderDetails.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:uuid/uuid.dart';
 
 class Orderplace extends StatefulWidget {
   final String selectedCylinder;
@@ -20,9 +24,12 @@ class Orderplace extends StatefulWidget {
 }
 
 class _OrderplaceState extends State<Orderplace> {
+  final String sessionId = const Uuid().v4();
   final sectorcontroller = TextEditingController();
   final streetcontroller = TextEditingController();
   final housenocontroller = TextEditingController();
+  final phonenocontroller = TextEditingController();
+  String _phoneNumberError = ''; // Add this controller
   String _selectedLocation = 'Bahria Enclave';
   final FirebaseAuth _auth = FirebaseAuth.instance;
   String userMobileNumber = ''; // To store the user's mobile number
@@ -65,7 +72,9 @@ class _OrderplaceState extends State<Orderplace> {
   bool _validateFields() {
     return sectorcontroller.text.isNotEmpty &&
         streetcontroller.text.isNotEmpty &&
-        housenocontroller.text.isNotEmpty;
+        housenocontroller.text.isNotEmpty &&
+        phonenocontroller.text.isNotEmpty &&
+        phonenocontroller.text.length == 11; // Check for exactly 11 digits
   }
 
   @override
@@ -74,7 +83,14 @@ class _OrderplaceState extends State<Orderplace> {
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
         backgroundColor: Colors.deepPurple[300],
-        title: const Text('Proceed With Order'),
+        title: Text("Proceed With Order",
+            style: GoogleFonts.bebasNeue(fontSize: 30, color: Colors.white)),
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(
+          bottom: Radius.circular(30),
+        )),
       ),
       body: Stack(
         children: [
@@ -112,7 +128,7 @@ class _OrderplaceState extends State<Orderplace> {
                     ),
                     title: const Text('Park View'),
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: Container(
@@ -189,7 +205,53 @@ class _OrderplaceState extends State<Orderplace> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 50),
+                  const SizedBox(
+                    height: 15,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        border: Border.all(color: Colors.white),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20.0),
+                        child: TextField(
+                          controller: phonenocontroller,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: 'Enter Phone Number',
+                            errorText: _phoneNumberError.isNotEmpty
+                                ? _phoneNumberError
+                                : null,
+                          ),
+                          textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.phone,
+                          onChanged: (value) {
+                            // Update error message based on input length
+                            if (value.length < 11) {
+                              setState(() {
+                                _phoneNumberError =
+                                    'Phone number should be at least 11 digits';
+                              });
+                            } else if (value.length > 11) {
+                              setState(() {
+                                _phoneNumberError =
+                                    'Phone number should not exceed 11 digits';
+                              });
+                            } else {
+                              setState(() {
+                                _phoneNumberError = '';
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: GestureDetector(
@@ -203,13 +265,11 @@ class _OrderplaceState extends State<Orderplace> {
                           String sector = sectorcontroller.text;
                           String street = streetcontroller.text;
                           String houseNo = housenocontroller.text;
-
-                          String selectedCylinder = widget.selectedCylinder;
-                          String selectedQuantity = widget.selectedQuantity;
+                          String phoneNumber =
+                              phonenocontroller.text; // Get phone number
 
                           // Get the user's phone number or email (if signed in)
                           User? user = _auth.currentUser;
-                          String? phoneNumber = user?.phoneNumber;
                           String? email = user?.email;
 
                           // Save the order details to Firestore
@@ -217,16 +277,15 @@ class _OrderplaceState extends State<Orderplace> {
                               .collection('orders')
                               .add({
                             'selectedLocation': selectedLocation,
-                            'selectedCylinder': selectedCylinder,
-                            'selectedQuantity': selectedQuantity,
+                            'selectedCylinder': widget.selectedCylinder,
+                            'selectedQuantity': widget.selectedQuantity,
                             'sector': sector,
                             'street': street,
                             'houseNo': houseNo,
-                            'phoneNumber': phoneNumber ??
-                                '', // Use user's phone number if available
+                            'phoneNumber':
+                                phoneNumber, // Use entered phone number
                             'email': email,
-                            'timestamp': FieldValue
-                                .serverTimestamp(), // Add a timestamp for ordering
+                            'timestamp': FieldValue.serverTimestamp(),
                           });
 
                           // Navigate to the DetailsPage
@@ -235,20 +294,20 @@ class _OrderplaceState extends State<Orderplace> {
                             MaterialPageRoute(
                               builder: (context) => DetailsPage(
                                 selectedLocation: selectedLocation,
-                                selectedCylinder: selectedCylinder,
-                                selectedQuantity: selectedQuantity,
+                                selectedCylinder: widget.selectedCylinder,
+                                selectedQuantity: widget.selectedQuantity,
                                 sector: sector,
                                 street: street,
                                 houseNo: houseNo,
-                                phoneNumber: userMobileNumber,
+                                phoneNumber: phoneNumber,
                               ),
                             ),
                           );
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
+                            const SnackBar(
                               content: Text(
-                                  "Please fill all the  required data inorder to proceed the order"),
+                                  "Please fill all the required data to proceed with the order"),
                               duration: Duration(seconds: 3),
                             ),
                           );

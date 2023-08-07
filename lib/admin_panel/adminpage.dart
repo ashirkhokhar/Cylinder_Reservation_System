@@ -1,119 +1,177 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/Authentication/Registerpage.dart';
+import 'package:flutter_application_1/Forget_Password/Forget_Password.dart';
+import 'package:flutter_application_1/admin_panel/adminpanel.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class AdminDashboard extends StatefulWidget {
+class adminlogin extends StatefulWidget {
+  adminlogin({super.key});
+
   @override
-  _AdminDashboardState createState() => _AdminDashboardState();
+  _adminloginState createState() => _adminloginState();
 }
 
-class _AdminDashboardState extends State<AdminDashboard> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  List<Map<String, dynamic>> _userData = [];
-  List<Map<String, dynamic>> _orderData = [];
+class _adminloginState extends State<adminlogin> {
+  final emailcontroller = TextEditingController();
+  final passwordcontroller = TextEditingController();
+  bool _isLoading = false; // To track whether login is in progress
 
-  @override
-  void initState() {
-    super.initState();
-    _fetchUserData();
-    _fetchOrderData();
-  }
-
-  Future<void> _fetchUserData() async {
-    try {
-      // TODO: Retrieve user data from Firebase Authentication (requires Firebase Admin SDK or Cloud Function)
-      // For example:
-      // final users = await getUsersFromAuthentication();
-      // setState(() {
-      //   _userData = users;
-      // });
-    } catch (e) {
-      print('Error fetching user data: $e');
-    }
-  }
-
-  Future<void> _fetchOrderData() async {
-    try {
-      final orderCollection = _firestore.collection('orders');
-      final querySnapshot = await orderCollection.get();
-      final orderData = querySnapshot.docs.map((doc) => doc.data()).toList();
-      setState(() {
-        _orderData = orderData;
-      });
-    } catch (e) {
-      print('Error fetching order data: $e');
-    }
-  }
-
-  Future<void> _signOut() async {
-    try {
-      await _auth.signOut();
-      // Navigate back to login screen or home page
-    } catch (e) {
-      print('Error signing out: $e');
-    }
-  }
+  // Predefined username and password
+  final String predefinedUsername = "admin@gmail.com";
+  final String predefinedPassword = "admin123";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Admin Dashboard'),
-        actions: [
-          IconButton(
-            onPressed: _signOut,
-            icon: Icon(Icons.logout),
-          ),
-        ],
+      backgroundColor: Colors.grey[300],
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    //const SizedBox(height: 25),
+                    const SizedBox(height: 30),
+                    Text(
+                      'W e l c o m e   A d m i n !',
+                      style: GoogleFonts.bebasNeue(
+                        fontSize: 40,
+                      ),
+                    ),
+                    const Text(
+                      'Login to Proceed !',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                    ),
+                    const SizedBox(height: 80),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: TextField(
+                            controller: emailcontroller,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Email or Mobile No',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          border: Border.all(color: Colors.white),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: TextField(
+                            controller: passwordcontroller,
+                            obscureText: true,
+                            decoration: const InputDecoration(
+                              border: InputBorder.none,
+                              hintText: 'Password',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    const SizedBox(height: 30),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 25),
+                      child: GestureDetector(
+                        onTap: () {
+                          // Check if entered credentials match predefined values
+                          if (emailcontroller.text.trim() ==
+                                  predefinedUsername &&
+                              passwordcontroller.text.trim() ==
+                                  predefinedPassword) {
+                            // Simulate a loading state
+                            setState(() {
+                              _isLoading = true;
+                            });
+
+                            // Simulate a delay to demonstrate loading state
+                            Future.delayed(Duration(seconds: 2), () {
+                              setState(() {
+                                _isLoading = false;
+                              });
+
+                              // TODO: Perform navigation or other actions upon successful login
+
+                              // Example: Navigating to a new screen
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AdminPanel()),
+                              );
+                            });
+                          } else {
+                            showSnackBar(context, "Invalid credentials");
+                          }
+                        },
+                        child: Container(
+                          width: 300,
+                          padding: const EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                            color: Colors.deepPurple[300],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Log in',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 2,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Show circular progress indicator when _isLoading is true
+            if (_isLoading)
+              Container(
+                color: Colors.black45, // Semi-transparent background
+                child: Center(
+                  child:
+                      CircularProgressIndicator(color: Colors.deepPurple[300]),
+                ),
+              ),
+          ],
+        ),
       ),
-      body: ListView(
-        children: [
-          // Display user data (if available)
-          _userData.isEmpty
-              ? Center(child: Text('No user data available'))
-              : DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Name')),
-                    DataColumn(label: Text('Email')),
-                    DataColumn(label: Text('Mobile No')),
-                  ],
-                  rows: _userData.map((user) {
-                    return DataRow(cells: [
-                      DataCell(Text(user['name'])),
-                      DataCell(Text(user['email'])),
-                      DataCell(Text(user['mobileNo'])),
-                    ]);
-                  }).toList(),
-                ),
-          Divider(),
-          // Display order data
-          _orderData.isEmpty
-              ? Center(child: Text('No order data available'))
-              : DataTable(
-                  columns: const [
-                    DataColumn(label: Text('Location')),
-                    DataColumn(label: Text('Cylinder')),
-                    DataColumn(label: Text('Quantity')),
-                    DataColumn(label: Text('Sector')),
-                    DataColumn(label: Text('Street')),
-                    DataColumn(label: Text('House No')),
-                  ],
-                  rows: _orderData.map((order) {
-                    return DataRow(cells: [
-                      DataCell(Text(order['location'])),
-                      DataCell(Text(order['cylinder'])),
-                      DataCell(Text(order['quantity'])),
-                      DataCell(Text(order['sector'])),
-                      DataCell(Text(order['street'])),
-                      DataCell(Text(order['houseNo'])),
-                    ]);
-                  }).toList(),
-                ),
-        ],
+    );
+  }
+
+  void showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
 }
-
-// Implement Admin Login Page and Authentication as per your requirements
