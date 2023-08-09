@@ -1,6 +1,6 @@
+// ignore_for_file: camel_case_types, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Authentication/Registerpage.dart';
-import 'package:flutter_application_1/Forget_Password/Forget_Password.dart';
 import 'package:flutter_application_1/admin_panel/adminpanel.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -14,10 +14,11 @@ class adminlogin extends StatefulWidget {
 class _adminloginState extends State<adminlogin> {
   final emailcontroller = TextEditingController();
   final passwordcontroller = TextEditingController();
+  bool _showPassword = false; // Track the visibility of the password
   bool _isLoading = false; // To track whether login is in progress
 
   // Predefined username and password
-  final String predefinedUsername = "admin@gmail.com";
+  final String predefinedUsername = "superadmin";
   final String predefinedPassword = "admin123";
 
   @override
@@ -35,7 +36,7 @@ class _adminloginState extends State<adminlogin> {
                     //const SizedBox(height: 25),
                     const SizedBox(height: 30),
                     Text(
-                      'W e l c o m e   A d m i n !',
+                      'Welcome  Admin !',
                       style: GoogleFonts.bebasNeue(
                         fontSize: 40,
                       ),
@@ -46,9 +47,9 @@ class _adminloginState extends State<adminlogin> {
                         fontSize: 18,
                       ),
                     ),
-                    const SizedBox(height: 80),
+                    const SizedBox(height: 20),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                      padding: const EdgeInsets.all(20.0),
                       child: Container(
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
@@ -56,20 +57,23 @@ class _adminloginState extends State<adminlogin> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 20.0),
+                          padding: EdgeInsets.symmetric(horizontal: 20),
                           child: TextField(
                             controller: emailcontroller,
                             decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Email or Mobile No',
-                            ),
+                                border: InputBorder.none,
+                                hintText: 'username',
+                                suffixIcon: Icon(
+                                  Icons.admin_panel_settings,
+                                  color: Colors.black,
+                                )),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    //const SizedBox(height: 20),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                      padding: const EdgeInsets.all(20.0),
                       child: Container(
                         decoration: BoxDecoration(
                           color: Colors.grey[200],
@@ -77,13 +81,26 @@ class _adminloginState extends State<adminlogin> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 20.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: TextField(
                             controller: passwordcontroller,
-                            obscureText: true,
-                            decoration: const InputDecoration(
+                            obscureText:
+                                !_showPassword, // Toggle password visibility
+                            decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: 'Password',
+                              hintText: 'password',
+                              suffixIcon: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _showPassword = !_showPassword;
+                                    });
+                                  },
+                                  child: Icon(
+                                    _showPassword
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.black,
+                                  )),
                             ),
                           ),
                         ),
@@ -106,7 +123,7 @@ class _adminloginState extends State<adminlogin> {
                             });
 
                             // Simulate a delay to demonstrate loading state
-                            Future.delayed(Duration(seconds: 2), () {
+                            Future.delayed(const Duration(seconds: 2), () {
                               setState(() {
                                 _isLoading = false;
                               });
@@ -117,7 +134,7 @@ class _adminloginState extends State<adminlogin> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => AdminPanel()),
+                                    builder: (context) => const AdminPanel()),
                               );
                             });
                           } else {
@@ -155,9 +172,8 @@ class _adminloginState extends State<adminlogin> {
             if (_isLoading)
               Container(
                 color: Colors.black45, // Semi-transparent background
-                child: Center(
-                  child:
-                      CircularProgressIndicator(color: Colors.deepPurple[300]),
+                child: const Center(
+                  child: CircularProgressIndicator(color: Colors.deepPurple),
                 ),
               ),
           ],

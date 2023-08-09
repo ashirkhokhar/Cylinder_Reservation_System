@@ -1,8 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_1/MenuScreen/Main_MenuScreen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class Ordertable extends StatelessWidget {
+class Ordertable extends StatefulWidget {
   final String selectedLocation;
   final String selectedCylinder;
   final String selectedQuantity;
@@ -21,32 +22,83 @@ class Ordertable extends StatelessWidget {
     required this.street,
   });
 
-  void _saveOrderToFirestore(BuildContext context) {
-    FirebaseFirestore.instance.collection('orderhistory').add({
-      'selectedLocation': selectedLocation,
-      'selectedCylinder': selectedCylinder,
-      'selectedQuantity': selectedQuantity,
-      'phoneNumber': phoneNumber,
-      'sector': sector,
-      'street': street,
-      'houseno': houseno,
-    }).then((value) {
+  @override
+  _OrdertableState createState() => _OrdertableState();
+}
+
+class _OrdertableState extends State<Ordertable> {
+  bool isButtonDisabled = false;
+  late Future<void> _delayedEnableButton;
+
+  @override
+  void initState() {
+    super.initState();
+    _delayedEnableButton = Future.value();
+  }
+
+  Future<void> _saveOrderToFirestore(BuildContext context) async {
+    if (isButtonDisabled) {
+      return;
+    }
+
+    setState(() {
+      isButtonDisabled = true;
+    });
+
+    final now = DateTime.now();
+    try {
+      await FirebaseFirestore.instance.collection('orderhistory').add({
+        'selectedLocation': widget.selectedLocation,
+        'selectedCylinder': widget.selectedCylinder,
+        'selectedQuantity': widget.selectedQuantity,
+        'phoneNumber': widget.phoneNumber,
+        'sector': widget.sector,
+        'street': widget.street,
+        'houseno': widget.houseno,
+        'orderTimestamp': now, // Add the timestamp field
+      });
       print('Order saved to Firestore!');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Your order has been placed successfully!'),
           duration: Duration(seconds: 3),
         ),
       );
-    }).catchError((error) {
+
+      // Cancel the previous delayed future if it exists
+      _delayedEnableButton = Future.delayed(const Duration(seconds: 5), () {});
+
+      // Navigate to another screen while staying on the current screen
+      await Future.delayed(const Duration(seconds: 2));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MenuScreen(), // Replace with your screen
+        ),
+      );
+    } catch (error) {
       print('Error saving order: $error');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('An error occurred while placing your order.'),
           duration: Duration(seconds: 3),
         ),
       );
-    });
+
+      // Cancel the previous delayed future if it exists
+      _delayedEnableButton = Future.delayed(const Duration(seconds: 5), () {});
+    } finally {
+      setState(() {
+        isButtonDisabled = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    // Cancel the delayed future to avoid calling setState after dispose
+    _delayedEnableButton = Future.value();
+    super.dispose();
   }
 
   @override
@@ -54,46 +106,62 @@ class Ordertable extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepPurple[300],
-        title: Text("place Order",
+        title: Text("Place Order",
             style: GoogleFonts.bebasNeue(fontSize: 30, color: Colors.white)),
         automaticallyImplyLeading: false,
         centerTitle: true,
         shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(30),
-        )),
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(30),
+          ),
+        ),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: _buildOrderHistoryTable(),
-          ),
-          // ignore: prefer_const_constructors
-          SizedBox(
-            height: 30,
-          ),
-          GestureDetector(
-            onTap: () => _saveOrderToFirestore(context),
-            child: Container(
-              width: 300,
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: Colors.deepPurple[300],
-                borderRadius: BorderRadius.circular(12),
+          Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: _buildOrderHistoryTable(),
               ),
-              child: const Center(
-                child: Text(
-                  'Place Order',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+              const SizedBox(
+                height: 30,
+              ),
+              GestureDetector(
+                onTap: () => _saveOrderToFirestore(context),
+                child: Container(
+                  width: 300,
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color:
+                        isButtonDisabled ? Colors.grey : Colors.deepPurple[300],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Place Order',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                    ),
                   ),
                 ),
               ),
+            ],
+          ),
+          if (isButtonDisabled)
+            Container(
+              color: Colors.black.withOpacity(0.6),
+              width: double.infinity,
+              height: double.infinity,
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: Colors.deepPurple,
+                ),
+              ),
             ),
-          )
         ],
       ),
     );
@@ -104,28 +172,6 @@ class Ordertable extends StatelessWidget {
       columnWidths: {0: const FixedColumnWidth(150.0)},
       border: TableBorder.all(color: Colors.grey),
       children: [
-        const TableRow(
-          children: [
-            TableCell(
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'Column Name:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            TableCell(
-              child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(
-                  'Value:',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-          ],
-        ),
         TableRow(
           children: [
             const TableCell(
@@ -137,7 +183,7 @@ class Ordertable extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(selectedLocation),
+                child: Text(widget.selectedLocation),
               ),
             ),
           ],
@@ -153,7 +199,7 @@ class Ordertable extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(selectedCylinder),
+                child: Text(widget.selectedCylinder),
               ),
             ),
           ],
@@ -169,7 +215,7 @@ class Ordertable extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(selectedQuantity),
+                child: Text(widget.selectedQuantity),
               ),
             ),
           ],
@@ -185,7 +231,7 @@ class Ordertable extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(phoneNumber),
+                child: Text(widget.phoneNumber),
               ),
             ),
           ],
@@ -201,7 +247,7 @@ class Ordertable extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(sector),
+                child: Text(widget.sector),
               ),
             ),
           ],
@@ -217,7 +263,7 @@ class Ordertable extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(street),
+                child: Text(widget.street),
               ),
             ),
           ],
@@ -231,7 +277,9 @@ class Ordertable extends StatelessWidget {
           ),
           TableCell(
             child: Padding(
-                padding: const EdgeInsets.all(8.0), child: Text(houseno)),
+              padding: const EdgeInsets.all(8.0),
+              child: Text(widget.houseno),
+            ),
           ),
         ]),
       ],
