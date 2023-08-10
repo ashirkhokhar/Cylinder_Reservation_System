@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/MenuScreen/Main_MenuScreen.dart';
@@ -56,6 +58,8 @@ class _OrdertableState extends State<Ordertable> {
         'street': widget.street,
         'houseno': widget.houseno,
         'orderTimestamp': now, // Add the timestamp field
+        'isNew': false,
+        'status': 'New', // Add the status field
       });
       print('Order saved to Firestore!');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -137,7 +141,7 @@ class _OrdertableState extends State<Ordertable> {
                         isButtonDisabled ? Colors.grey : Colors.deepPurple[300],
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Center(
+                  child: const Center(
                     child: Text(
                       'Place Order',
                       style: TextStyle(
@@ -156,7 +160,7 @@ class _OrdertableState extends State<Ordertable> {
               color: Colors.black.withOpacity(0.6),
               width: double.infinity,
               height: double.infinity,
-              child: Center(
+              child: const Center(
                 child: CircularProgressIndicator(
                   color: Colors.deepPurple,
                 ),

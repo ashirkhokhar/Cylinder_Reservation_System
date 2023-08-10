@@ -1,14 +1,26 @@
-// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:flutter/material.dart';
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Admin Panel',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+      ),
+      home: const AdminPanel(),
+    );
+  }
+}
 
 class AdminPanel extends StatelessWidget {
-  const AdminPanel({super.key});
+  const AdminPanel({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +37,10 @@ class AdminPanel extends StatelessWidget {
           automaticallyImplyLeading: false,
           centerTitle: true,
           shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-            bottom: Radius.circular(30),
-          )),
-
-          // ... (existing app bar code)
+            borderRadius: BorderRadius.vertical(
+              bottom: Radius.circular(30),
+            ),
+          ),
         ),
         body: const AllOrdersList(),
       ),
@@ -41,21 +52,18 @@ class AdminPanel extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("Logout Confirmation"),
-          content: Text("Are you sure you want to log out?"),
+          title: const Text("Logout Confirmation"),
+          content: const Text("Are you sure you want to log out?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text("Cancel"),
+              child: const Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
-                // Perform logout logic here
-                // For example: Navigator.of(context).popUntil((route) => route.isFirst);
-                Navigator.of(context)
-                    .pop(true); // Return true to allow back navigation
+                Navigator.of(context).pop(true);
               },
-              child: Text("Logout"),
+              child: const Text("Logout"),
             ),
           ],
         );
@@ -64,10 +72,8 @@ class AdminPanel extends StatelessWidget {
   }
 }
 
-// ... (other code remains the same)
-
 class AllOrdersList extends StatefulWidget {
-  const AllOrdersList({super.key});
+  const AllOrdersList({Key? key});
 
   @override
   State<AllOrdersList> createState() => _AllOrdersListState();
@@ -76,11 +82,57 @@ class AllOrdersList extends StatefulWidget {
 class _AllOrdersListState extends State<AllOrdersList> {
   late TextEditingController _searchController;
   String _searchText = "";
+  List<String> _newOrders = [];
+  late SharedPreferences _preferences;
 
   @override
   void initState() {
     super.initState();
     _searchController = TextEditingController();
+    _initializeSharedPreferences();
+  }
+
+  Future<void> _initializeSharedPreferences() async {
+    _preferences = await SharedPreferences.getInstance();
+    final newOrderIds = _preferences.getStringList('new_orders') ?? [];
+
+    setState(() {
+      _newOrders = newOrderIds;
+    });
+  }
+
+  Future<void> _updateNewOrdersStatus() async {
+    final allOrderIds = _newOrders;
+    await _preferences.setStringList('new_orders', allOrderIds);
+  }
+
+  void _handleNewOrder(String orderDocumentId) async {
+    // Update the order status in Firestore from 'New' to 'Pending'
+    final orderRef = FirebaseFirestore.instance
+        .collection('orderhistory')
+        .doc(orderDocumentId);
+
+    try {
+      await orderRef.update({
+        'status': 'Pending',
+        'isNew': false, // Set isNew to false
+      });
+
+      setState(() {
+        // Remove the order from the _newOrders list
+        _newOrders.remove(orderDocumentId);
+      });
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              OrderDetailsScreen(orderDocumentId: orderDocumentId),
+        ),
+      );
+    } catch (error) {
+      print('Error updating order status: $error');
+    }
   }
 
   @override
@@ -101,11 +153,11 @@ class _AllOrdersListState extends State<AllOrdersList> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: Container(
-            height: 60, // Fixed height for the search bar
+            height: 60,
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -147,10 +199,11 @@ class _AllOrdersListState extends State<AllOrdersList> {
                 .snapshots(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                    child: const CircularProgressIndicator(
-                  color: Colors.deepPurple,
-                ));
+                return const Center(
+                  child: CircularProgressIndicator(
+                    color: Colors.deepPurple,
+                  ),
+                );
               }
 
               if (snapshot.hasError) {
@@ -190,135 +243,229 @@ class _AllOrdersListState extends State<AllOrdersList> {
                 itemBuilder: (context, index) {
                   final orderData =
                       filteredOrders[index].data() as Map<String, dynamic>;
+                  final orderDocumentId = filteredOrders[index].id;
+
+                  final status = orderData['status'];
+                  final isNewOrder = _newOrders.contains(orderDocumentId);
 
                   return Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(23),
-                      ),
-                      child: ListTile(
-                        tileColor: Colors.deepPurple[300],
-                        title: Text(
-                          'Order ${index + 1}',
-                          style: TextStyle(color: Colors.white),
+                      padding: const EdgeInsets.all(8.0),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(23),
                         ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SizedBox(height: 5),
-                            Text(
-                              'Location: ${orderData['selectedLocation']}',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              'Phone Number: ${orderData['phoneNumber']}',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            SizedBox(height: 6),
-                            Text(
-                              'Order Time: ${formatTime(parseOrderTimestamp(orderData['orderTimestamp']))}',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
+                        child: ListTile(
+                          title: Text(
+                            'Order ${index + 1}',
+                          ),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 5),
+                              Text(
+                                'Location: ${orderData['selectedLocation']}',
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Phone Number: ${orderData['phoneNumber']}',
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                'Order Time: ${formatTime(parseOrderTimestamp(orderData['orderTimestamp']))}',
+                              ),
+                            ],
+                          ),
+                          trailing: status == 'New'
+                              ? Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.deepPurple[300],
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  child: const Text(
+                                    'New',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                )
+                              : status == 'Pending'
+                                  ? Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.yellow[700],
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 4),
+                                      child: const Text(
+                                        'Pending',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    )
+                                  : null,
+                          onTap: () {
+                            final orderDocumentId = filteredOrders[index].id;
+                            _handleOrderTap(orderDocumentId);
+                          },
                         ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  OrderDetailsScreen(orderData: orderData),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  );
+                      ));
                 },
               );
             },
           ),
-        )
+        ),
       ],
     );
   }
+
+  void _handleOrderTap(String orderDocumentId) async {
+    await _markOrderAsPending(orderDocumentId);
+  }
+
+  Future<void> _markOrderAsPending(String orderDocumentId) async {
+    final orderRef = FirebaseFirestore.instance
+        .collection('orderhistory')
+        .doc(orderDocumentId);
+
+    try {
+      await orderRef.update({
+        'status': 'Pending',
+        'isNew': false,
+      });
+
+      // Refresh the _newOrders list
+      setState(() {
+        _newOrders.remove(orderDocumentId);
+      });
+      _updateNewOrdersStatus();
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              OrderDetailsScreen(orderDocumentId: orderDocumentId),
+        ),
+      );
+    } catch (error) {
+      print('Error updating order status: $error');
+    }
+  }
 }
 
-class OrderDetailsScreen extends StatelessWidget {
-  final Map<String, dynamic> orderData;
+class OrderDetailsScreen extends StatefulWidget {
+  final String orderDocumentId;
 
-  const OrderDetailsScreen({Key? key, required this.orderData})
+  const OrderDetailsScreen({Key? key, required this.orderDocumentId})
       : super(key: key);
 
+  @override
+  State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
+}
+
+class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepPurple[300],
-        title: Text("Order Details",
-            style: GoogleFonts.bebasNeue(fontSize: 30, color: Colors.white)),
+        title: Text(
+          "Order Details",
+          style: GoogleFonts.bebasNeue(fontSize: 30, color: Colors.white),
+        ),
         automaticallyImplyLeading: false,
         centerTitle: true,
         shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(30),
-        )),
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(30),
+          ),
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columns: [
-              const DataColumn(label: Text('Field')),
-              const DataColumn(label: Text('Value')),
-            ],
-            rows: [
-              DataRow(cells: [
-                const DataCell(Text('Selected Location')),
-                DataCell(Text(orderData['selectedLocation'])),
-              ]),
-              DataRow(cells: [
-                const DataCell(Text('Selected Cylinder')),
-                DataCell(Text(orderData['selectedCylinder'])),
-              ]),
-              DataRow(cells: [
-                const DataCell(Text('Selected Quantity')),
-                DataCell(Text(orderData['selectedQuantity'])),
-              ]),
-              DataRow(cells: [
-                const DataCell(Text('Sector')),
-                DataCell(Text(orderData['sector'])),
-              ]),
-              DataRow(cells: [
-                const DataCell(Text('House No')),
-                DataCell(Text(orderData['houseno'])),
-              ]),
-              DataRow(cells: [
-                const DataCell(Text('Street')),
-                DataCell(Text(orderData['street'])),
-              ]),
-              DataRow(cells: [
-                const DataCell(Text('Phone Number')),
-                DataCell(Text(orderData['phoneNumber'])),
-              ]),
-              DataRow(cells: [
-                const DataCell(Text('Order Time')),
-                DataCell(Text(formatTime(
-                    parseOrderTimestamp(orderData['orderTimestamp'])))),
-              ]),
+          child: StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('orderhistory')
+                .doc(widget.orderDocumentId)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator(
+                  color: Colors.deepPurple,
+                );
+              }
 
-              // Add more data rows as needed
-            ],
+              if (!snapshot.hasData || !snapshot.data!.exists) {
+                return const Text('Order not found');
+              }
+
+              final orderData = snapshot.data!.data() as Map<String, dynamic>;
+
+              return DataTable(
+                columns: [
+                  const DataColumn(label: Text('Field')),
+                  const DataColumn(label: Text('Value')),
+                ],
+                rows: [
+                  DataRow(cells: [
+                    const DataCell(Text('Selected Location')),
+                    DataCell(Text(orderData['selectedLocation'])),
+                  ]),
+                  DataRow(cells: [
+                    const DataCell(Text('Selected Cylinder')),
+                    DataCell(Text(orderData['selectedCylinder'])),
+                  ]),
+                  DataRow(cells: [
+                    const DataCell(Text('Selected Quantity')),
+                    DataCell(Text(orderData['selectedQuantity'])),
+                  ]),
+                  DataRow(cells: [
+                    const DataCell(Text('Sector')),
+                    DataCell(Text(orderData['sector'])),
+                  ]),
+                  DataRow(cells: [
+                    const DataCell(Text('House No')),
+                    DataCell(Text(orderData['houseno'])),
+                  ]),
+                  DataRow(cells: [
+                    const DataCell(Text('Street')),
+                    DataCell(Text(orderData['street'])),
+                  ]),
+                  DataRow(cells: [
+                    const DataCell(Text('Phone Number')),
+                    DataCell(Text(orderData['phoneNumber'])),
+                  ]),
+                  DataRow(cells: [
+                    const DataCell(Text('Order Time')),
+                    DataCell(Text(formatTime(
+                        parseOrderTimestamp(orderData['orderTimestamp'])))),
+                  ]),
+                  DataRow(cells: [
+                    const DataCell(Text('Order Status')),
+                    DataCell(Text(orderData['isNew']
+                        ? 'New'
+                        : 'Pending')), // Update this line
+                  ]),
+                  // Add more data rows as needed
+                ],
+              );
+            },
           ),
         ),
       ),
     );
   }
+}
 
-  DateTime parseOrderTimestamp(Timestamp timestamp) {
-    return timestamp.toDate();
-  }
+DateTime parseOrderTimestamp(Timestamp timestamp) {
+  return timestamp.toDate();
 }
 
 String formatTime(DateTime dateTime) {

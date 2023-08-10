@@ -18,7 +18,7 @@ class _adminloginState extends State<adminlogin> {
   bool _isLoading = false; // To track whether login is in progress
 
   // Predefined username and password
-  final String predefinedUsername = "superadmin";
+  final String predefinedUsername = "admin@gmail.com";
   final String predefinedPassword = "admin123";
 
   @override

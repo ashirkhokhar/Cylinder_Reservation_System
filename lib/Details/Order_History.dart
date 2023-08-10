@@ -38,6 +38,7 @@ class OrdersRecords extends StatelessWidget {
               const DataColumn(label: Text('Street')),
               const DataColumn(label: Text('Phone No')),
               const DataColumn(label: Text('Status')),
+              // Display Timestamp
             ],
             rows: orderProvider.orders.asMap().entries.map((entry) {
               final index = entry.key + 1; // Serial number
@@ -47,12 +48,13 @@ class OrdersRecords extends StatelessWidget {
                   DataCell(Text('$index')), // Display serial number
                   DataCell(Text(order.selectedLocation)),
                   DataCell(Text(order.selectedCylinder)),
-                  DataCell(Text(order
-                      .selectedQuantity)), // Display "Pending" for all orders
+                  DataCell(Text(order.selectedQuantity)),
                   DataCell(Text(order.sector)),
                   DataCell(Text(order.houseNo)),
                   DataCell(Text(order.street)),
                   DataCell(Text(order.phoneNumber)),
+
+                  // Display Timestamp
                   DataCell(Text('Pending')),
                 ],
               );

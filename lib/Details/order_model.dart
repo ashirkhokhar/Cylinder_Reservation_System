@@ -6,6 +6,7 @@ class OrderData {
   final String street;
   final String houseNo;
   final String phoneNumber;
+  // Add this field
 
   OrderData({
     required this.selectedLocation,
