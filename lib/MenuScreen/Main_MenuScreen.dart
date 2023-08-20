@@ -65,8 +65,8 @@ class MenuScreen extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.symmetric(horizontal: 10.0),
                           child: Text(
-                            "Confirm, Deliver, Satisfy Your Order Experience, Our Priority!",
-                            style: TextStyle(
+                            "Secure Order Placement, Satisfaction",
+                            style: GoogleFonts.poppins(
                               color: Colors.white,
                               fontSize: 11,
                             ),
@@ -109,7 +109,7 @@ class MenuScreen extends StatelessWidget {
                           padding: EdgeInsets.symmetric(horizontal: 10.0),
                           child: Text(
                             "Order history: Track your past orders with ease.",
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Colors.white,
                               fontSize: 11,
                             ),
@@ -149,13 +149,13 @@ class MenuScreen extends StatelessWidget {
                       fontSize: 25,
                       color: Colors.white,
                     ),
-                  ),
+                  ), //
                   SizedBox(height: 20),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: Text(
                       "Admin Access: Secure login for management control.",
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontSize: 11,
                       ),

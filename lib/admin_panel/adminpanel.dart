@@ -52,18 +52,32 @@ class AdminPanel extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text("Logout Confirmation"),
-          content: const Text("Are you sure you want to log out?"),
+          backgroundColor: Colors.deepPurple[300],
+          title: Text(
+            "Logout Confirmation",
+            style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          content: Text(
+            "Are you sure you want to log out?",
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text("Cancel"),
+              child: Text(
+                "Cancel",
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: const Text("Logout"),
+              child: Text(
+                "Logout",
+                style: GoogleFonts.poppins(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -264,14 +278,19 @@ class _AllOrdersListState extends State<AllOrdersList> {
                               const SizedBox(height: 5),
                               Text(
                                 'Location: ${orderData['selectedLocation']}',
+                                style: GoogleFonts.poppins(),
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 'Phone Number: ${orderData['phoneNumber']}',
+                                style: GoogleFonts.poppins(),
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 'Order Time: ${formatTime(parseOrderTimestamp(orderData['orderTimestamp']))}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 10,
+                                ),
                               ),
                             ],
                           ),
@@ -283,9 +302,9 @@ class _AllOrdersListState extends State<AllOrdersList> {
                                   ),
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 4),
-                                  child: const Text(
+                                  child: Text(
                                     'New',
-                                    style: TextStyle(
+                                    style: GoogleFonts.poppins(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20,
@@ -300,9 +319,9 @@ class _AllOrdersListState extends State<AllOrdersList> {
                                       ),
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 8, vertical: 4),
-                                      child: const Text(
+                                      child: Text(
                                         'Pending',
-                                        style: TextStyle(
+                                        style: GoogleFonts.poppins(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 20,
@@ -415,43 +434,89 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 ],
                 rows: [
                   DataRow(cells: [
-                    const DataCell(Text('Selected Location')),
-                    DataCell(Text(orderData['selectedLocation'])),
+                    DataCell(Text(
+                      'Selected Location',
+                      style: GoogleFonts.poppins(),
+                    )),
+                    DataCell(Text(
+                      orderData['selectedLocation'],
+                      style: GoogleFonts.poppins(),
+                    )),
                   ]),
                   DataRow(cells: [
-                    const DataCell(Text('Selected Cylinder')),
-                    DataCell(Text(orderData['selectedCylinder'])),
+                    DataCell(Text(
+                      'Selected Cylinder',
+                      style: GoogleFonts.poppins(),
+                    )),
+                    DataCell(Text(
+                      orderData['selectedCylinder'],
+                      style: GoogleFonts.poppins(),
+                    )),
                   ]),
                   DataRow(cells: [
-                    const DataCell(Text('Selected Quantity')),
-                    DataCell(Text(orderData['selectedQuantity'])),
+                    DataCell(Text(
+                      'Selected Quantity',
+                      style: GoogleFonts.poppins(),
+                    )),
+                    DataCell(Text(
+                      orderData['selectedQuantity'],
+                      style: GoogleFonts.poppins(),
+                    )),
                   ]),
                   DataRow(cells: [
-                    const DataCell(Text('Sector')),
-                    DataCell(Text(orderData['sector'])),
+                    DataCell(Text(
+                      'Sector',
+                      style: GoogleFonts.poppins(),
+                    )),
+                    DataCell(Text(
+                      orderData['sector'],
+                      style: GoogleFonts.poppins(),
+                    )),
                   ]),
                   DataRow(cells: [
-                    const DataCell(Text('House No')),
-                    DataCell(Text(orderData['houseno'])),
+                    DataCell(Text(
+                      'House No',
+                      style: GoogleFonts.poppins(),
+                    )),
+                    DataCell(Text(
+                      orderData['houseno'],
+                      style: GoogleFonts.poppins(),
+                    )),
                   ]),
                   DataRow(cells: [
-                    const DataCell(Text('Street')),
-                    DataCell(Text(orderData['street'])),
+                    DataCell(Text(
+                      'Street',
+                      style: GoogleFonts.poppins(),
+                    )),
+                    DataCell(Text(
+                      orderData['street'],
+                      style: GoogleFonts.poppins(),
+                    )),
                   ]),
                   DataRow(cells: [
-                    const DataCell(Text('Phone Number')),
-                    DataCell(Text(orderData['phoneNumber'])),
+                    DataCell(Text(
+                      'Phone Number',
+                      style: GoogleFonts.poppins(),
+                    )),
+                    DataCell(Text(
+                      orderData['phoneNumber'],
+                      style: GoogleFonts.poppins(),
+                    )),
                   ]),
                   DataRow(cells: [
-                    const DataCell(Text('Order Time')),
+                    DataCell(Text(
+                      'Order Time',
+                      style: GoogleFonts.poppins(),
+                    )),
                     DataCell(Text(formatTime(
                         parseOrderTimestamp(orderData['orderTimestamp'])))),
                   ]),
                   DataRow(cells: [
                     const DataCell(Text('Order Status')),
-                    DataCell(Text(orderData['isNew']
-                        ? 'New'
-                        : 'Pending')), // Update this line
+                    DataCell(Text(
+                      orderData['isNew'] ? 'New' : 'Pending',
+                      style: GoogleFonts.poppins(),
+                    )), // Update this line
                   ]),
                   // Add more data rows as needed
                 ],

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Order/orderplace.dart';
@@ -26,11 +26,10 @@ class _OrderCylinderState extends State<OrderCylinder> {
       builder: (BuildContext dialogContext) {
         String selectedValue = _selectedQuantity; // Default selected value
         return AlertDialog(
-          title: const Text(
+          title: Text(
             'Select Quantity',
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               fontSize: 20,
-              fontWeight: FontWeight.bold,
             ),
           ),
           content: Container(
@@ -50,8 +49,16 @@ class _OrderCylinderState extends State<OrderCylinder> {
                           selectedValue = newValue!;
                         });
                       },
-                      dropdownColor:
-                          Colors.white, // Set the color of the dropdown
+                      dropdownColor: Colors
+                          .deepPurple[300], // Set the color of the dropdown
+                      style: GoogleFonts.poppins(),
+                      // Dropdown text style
+                      underline: Container(),
+                      icon: Icon(
+                        Icons
+                            .arrow_drop_down, // Change the icon to a different one if desired
+                        color: Colors.white, // Change the icon color here
+                      ), // Remove dropdown underline
                       items: quantityOptions.map<DropdownMenuItem<String>>(
                         (String value) {
                           return DropdownMenuItem<String>(
@@ -76,27 +83,32 @@ class _OrderCylinderState extends State<OrderCylinder> {
                             Navigator.pop(dialogContext);
                           },
                           style: ElevatedButton.styleFrom(
-                            primary: Colors.deepPurple[300],
+                            backgroundColor: Colors.deepPurple[300],
                           ),
-                          child: const Text('Cancel'),
+                          child: Text(
+                            'Cancel',
+                            style: GoogleFonts.poppins(),
+                          ),
                         ),
                         ElevatedButton(
-                          onPressed: () {
-                            if (selectedValue.isNotEmpty) {
-                              Navigator.pop(dialogContext, selectedValue);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Please select a quantity.'),
-                                ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.deepPurple[300],
-                          ),
-                          child: const Text('OK'),
-                        ),
+                            onPressed: () {
+                              if (selectedValue.isNotEmpty) {
+                                Navigator.pop(dialogContext, selectedValue);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Please select a quantity.'),
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.deepPurple[300],
+                            ),
+                            child: Text(
+                              'OK',
+                              style: GoogleFonts.poppins(),
+                            )),
                       ],
                     ),
                   ],
@@ -140,9 +152,13 @@ class _OrderCylinderState extends State<OrderCylinder> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                const SizedBox(height: 25),
+                Text(
                   'Please let us know which cylinder do you want:',
-                  style: TextStyle(fontSize: 18),
+                  style: GoogleFonts.poppins(fontSize: 18),
+                ),
+                const SizedBox(
+                  height: 30,
                 ),
                 GestureDetector(
                   onTap: () {
@@ -161,9 +177,11 @@ class _OrderCylinderState extends State<OrderCylinder> {
                           _showQuantityDialog();
                         });
                       },
+                      activeColor: Colors.deepPurple,
                     ),
                     title: Text(
                       'Small – 11 KGs${_selectedCylindersize == 'Small – 11 KGs' ? ' ($_selectedQuantity)' : ''}',
+                      style: GoogleFonts.poppins(),
                     ),
                   ),
                 ),
@@ -184,18 +202,21 @@ class _OrderCylinderState extends State<OrderCylinder> {
                           _showQuantityDialog();
                         });
                       },
+                      activeColor: Colors.deepPurple,
                     ),
                     title: Text(
                       'Large – 45 KGs${_selectedCylindersize == 'Large – 45 KGs' ? ' ($_selectedQuantity)' : ''}',
+                      style: GoogleFonts.poppins(),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 40),
                 _selectedQuantity.isNotEmpty
                     ? Text(
                         'Selected: $_selectedCylindersize ($_selectedQuantity)',
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                        ),
                       )
                     : const Text(
                         'Please select a quantity.',
@@ -229,20 +250,27 @@ class _OrderCylinderState extends State<OrderCylinder> {
                       });
                     },
                     child: Container(
-                      padding: const EdgeInsets.all(15),
+                      height: 50,
+                      margin: const EdgeInsets.symmetric(horizontal: 50),
                       decoration: BoxDecoration(
-                        color: Colors.deepPurple[300],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Next',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        ),
+                          borderRadius: BorderRadius.circular(50),
+                          color: Colors.deepPurple[300]),
+                      child: Center(
+                        child: _isLoading
+                            ? Container(
+                                width: 24, // Adjust the size as needed
+                                height: 24, // Adjust the size as needed
+                                child: const CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                "Next",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -250,13 +278,6 @@ class _OrderCylinderState extends State<OrderCylinder> {
               ],
             ),
           ),
-          if (_isLoading)
-            Container(
-              color: Colors.black45,
-              child: const Center(
-                child: CircularProgressIndicator(color: Colors.deepPurple),
-              ),
-            ),
         ],
       ),
     );

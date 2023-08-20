@@ -63,7 +63,10 @@ class _OrderplaceState extends State<Orderplace> {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Please let us know about your location:'),
+                    Text(
+                      'Please let us know about your location:',
+                      style: GoogleFonts.poppins(fontSize: 18),
+                    ),
                     const SizedBox(
                       height: 10,
                     ),
@@ -82,8 +85,12 @@ class _OrderplaceState extends State<Orderplace> {
                               _selectedLocation = value!;
                             });
                           },
+                          activeColor: Colors.deepPurple,
                         ),
-                        title: const Text('Bahria Enclave'),
+                        title: Text(
+                          'Bahria Enclave',
+                          style: GoogleFonts.poppins(),
+                        ),
                       ),
                     ),
                     GestureDetector(
@@ -101,8 +108,12 @@ class _OrderplaceState extends State<Orderplace> {
                               _selectedLocation = value!;
                             });
                           },
+                          activeColor: Colors.deepPurple,
                         ),
-                        title: const Text('Park View'),
+                        title: Text(
+                          'Park View',
+                          style: GoogleFonts.poppins(),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -118,9 +129,10 @@ class _OrderplaceState extends State<Orderplace> {
                           padding: const EdgeInsets.only(left: 20.0),
                           child: TextField(
                             controller: sectorcontroller,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: 'Enter Sector',
+                              hintStyle: GoogleFonts.poppins(),
                             ),
                             textInputAction: TextInputAction.next,
                             textCapitalization: TextCapitalization.words,
@@ -130,7 +142,7 @@ class _OrderplaceState extends State<Orderplace> {
                       ),
                     ),
                     const SizedBox(
-                      height: 15,
+                      height: 12,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -144,9 +156,10 @@ class _OrderplaceState extends State<Orderplace> {
                           padding: const EdgeInsets.only(left: 20.0),
                           child: TextField(
                             controller: streetcontroller,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: 'Enter Street',
+                              hintStyle: GoogleFonts.poppins(),
                             ),
                             textInputAction: TextInputAction.next,
                             textCapitalization: TextCapitalization.words,
@@ -156,7 +169,7 @@ class _OrderplaceState extends State<Orderplace> {
                       ),
                     ),
                     const SizedBox(
-                      height: 15,
+                      height: 12,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -170,10 +183,11 @@ class _OrderplaceState extends State<Orderplace> {
                           padding: const EdgeInsets.only(left: 20.0),
                           child: TextField(
                             controller: housenocontroller,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText:
                                   'Enter House No / Apartment No. and Building Details',
+                              hintStyle: GoogleFonts.poppins(),
                             ),
                             textInputAction: TextInputAction.next,
                             textCapitalization: TextCapitalization.words,
@@ -183,7 +197,7 @@ class _OrderplaceState extends State<Orderplace> {
                       ),
                     ),
                     const SizedBox(
-                      height: 15,
+                      height: 12,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -200,6 +214,7 @@ class _OrderplaceState extends State<Orderplace> {
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               hintText: 'Enter Phone Number',
+                              hintStyle: GoogleFonts.poppins(),
                               errorText: _phoneNumberError.isNotEmpty
                                   ? _phoneNumberError
                                   : null,
@@ -231,7 +246,7 @@ class _OrderplaceState extends State<Orderplace> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 15),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: AbsorbPointer(
@@ -268,9 +283,10 @@ class _OrderplaceState extends State<Orderplace> {
                               );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
+                                SnackBar(
                                   content: Text(
                                     "Please fill all the required data to proceed with the order",
+                                    style: GoogleFonts.poppins(fontSize: 13),
                                   ),
                                   duration: Duration(seconds: 3),
                                 ),
@@ -281,38 +297,36 @@ class _OrderplaceState extends State<Orderplace> {
                               _isLoading = false;
                             });
                           },
-                          child: Container(
-                            padding: const EdgeInsets.all(15),
+                          child: (Container(
+                            height: 50,
+                            margin: const EdgeInsets.symmetric(horizontal: 50),
                             decoration: BoxDecoration(
-                              color: Colors.deepPurple[300],
-                              borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(50),
+                                color: Colors.deepPurple[300]),
+                            child: Center(
+                              child: _isLoading
+                                  ? Container(
+                                      width: 24, // Adjust the size as needed
+                                      height: 24, // Adjust the size as needed
+                                      child: const CircularProgressIndicator(
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text(
+                                      "Submit",
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                             ),
-                            child: const Center(
-                              child: Text(
-                                'Submit',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                ),
-                              ),
-                            ),
-                          ),
+                          )),
                         ),
                       ),
                     ),
                   ]),
             ),
           ),
-          if (_isLoading)
-            Container(
-              color: Colors.black45,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.deepPurple,
-                ),
-              ),
-            ),
         ],
       ),
     );

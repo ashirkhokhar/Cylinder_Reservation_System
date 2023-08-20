@@ -30,6 +30,7 @@ class Ordertable extends StatefulWidget {
 
 class _OrdertableState extends State<Ordertable> {
   bool isButtonDisabled = false;
+  bool _isLoading = false;
   late Future<void> _delayedEnableButton;
 
   @override
@@ -49,6 +50,10 @@ class _OrdertableState extends State<Ordertable> {
 
     final now = DateTime.now();
     try {
+      setState(() {
+        _isLoading = true;
+      });
+
       await FirebaseFirestore.instance.collection('orderhistory').add({
         'selectedLocation': widget.selectedLocation,
         'selectedCylinder': widget.selectedCylinder,
@@ -62,18 +67,21 @@ class _OrdertableState extends State<Ordertable> {
         'status': 'New', // Add the status field
       });
       print('Order saved to Firestore!');
+
+      // Simulate a delay to demonstrate success and reset state
+      await Future.delayed(const Duration(seconds: 2));
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Your order has been placed successfully!'),
-          duration: Duration(seconds: 3),
+        SnackBar(
+          content: Text(
+            'Your order has been placed successfully!',
+            style: GoogleFonts.poppins(),
+          ),
+          duration: const Duration(seconds: 3),
         ),
       );
 
-      // Cancel the previous delayed future if it exists
-      _delayedEnableButton = Future.delayed(const Duration(seconds: 5), () {});
-
       // Navigate to another screen while staying on the current screen
-      await Future.delayed(const Duration(seconds: 2));
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -88,12 +96,10 @@ class _OrdertableState extends State<Ordertable> {
           duration: Duration(seconds: 3),
         ),
       );
-
-      // Cancel the previous delayed future if it exists
-      _delayedEnableButton = Future.delayed(const Duration(seconds: 5), () {});
     } finally {
       setState(() {
         isButtonDisabled = false;
+        _isLoading = false;
       });
     }
   }
@@ -134,38 +140,32 @@ class _OrdertableState extends State<Ordertable> {
               GestureDetector(
                 onTap: () => _saveOrderToFirestore(context),
                 child: Container(
-                  width: 300,
-                  padding: const EdgeInsets.all(15),
+                  height: 50,
+                  margin: const EdgeInsets.symmetric(horizontal: 50),
                   decoration: BoxDecoration(
-                    color:
-                        isButtonDisabled ? Colors.grey : Colors.deepPurple[300],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Place Order',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                      ),
-                    ),
+                      borderRadius: BorderRadius.circular(50),
+                      color: Colors.deepPurple[300]),
+                  child: Center(
+                    child: _isLoading
+                        ? Container(
+                            width: 24, // Adjust the size as needed
+                            height: 24,
+                            child: const CircularProgressIndicator(
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text(
+                            "Place Order",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ),
             ],
           ),
-          if (isButtonDisabled)
-            Container(
-              color: Colors.black.withOpacity(0.6),
-              width: double.infinity,
-              height: double.infinity,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.deepPurple,
-                ),
-              ),
-            ),
         ],
       ),
     );
@@ -178,111 +178,114 @@ class _OrdertableState extends State<Ordertable> {
       children: [
         TableRow(
           children: [
-            const TableCell(
+            TableCell(
               child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text(' Location:'),
+                padding: const EdgeInsets.all(8.0),
+                child: Text(' Location:', style: GoogleFonts.poppins()),
               ),
             ),
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(widget.selectedLocation),
+                child:
+                    Text(widget.selectedLocation, style: GoogleFonts.poppins()),
               ),
             ),
           ],
         ),
         TableRow(
           children: [
-            const TableCell(
+            TableCell(
               child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('Cylinder:'),
+                padding: const EdgeInsets.all(8.0),
+                child: Text('Cylinder:', style: GoogleFonts.poppins()),
               ),
             ),
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(widget.selectedCylinder),
+                child:
+                    Text(widget.selectedCylinder, style: GoogleFonts.poppins()),
               ),
             ),
           ],
         ),
         TableRow(
           children: [
-            const TableCell(
+            TableCell(
               child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('Quantity:'),
+                padding: const EdgeInsets.all(8.0),
+                child: Text('Quantity:', style: GoogleFonts.poppins()),
               ),
             ),
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(widget.selectedQuantity),
+                child:
+                    Text(widget.selectedQuantity, style: GoogleFonts.poppins()),
               ),
             ),
           ],
         ),
         TableRow(
           children: [
-            const TableCell(
+            TableCell(
               child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('Phone Number:'),
+                padding: const EdgeInsets.all(8.0),
+                child: Text('Phone Number:', style: GoogleFonts.poppins()),
               ),
             ),
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(widget.phoneNumber),
+                child: Text(widget.phoneNumber, style: GoogleFonts.poppins()),
               ),
             ),
           ],
         ),
         TableRow(
           children: [
-            const TableCell(
+            TableCell(
               child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('Sector:'),
+                padding: const EdgeInsets.all(8.0),
+                child: Text('Sector:', style: GoogleFonts.poppins()),
               ),
             ),
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(widget.sector),
+                child: Text(widget.sector, style: GoogleFonts.poppins()),
               ),
             ),
           ],
         ),
         TableRow(
           children: [
-            const TableCell(
+            TableCell(
               child: Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Text('Street:'),
+                padding: const EdgeInsets.all(8.0),
+                child: Text('Street:', style: GoogleFonts.poppins()),
               ),
             ),
             TableCell(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(widget.street),
+                child: Text(widget.street, style: GoogleFonts.poppins()),
               ),
             ),
           ],
         ),
         TableRow(children: [
-          const TableCell(
+          TableCell(
             child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('House No:'),
+              padding: const EdgeInsets.all(8.0),
+              child: Text('House No:', style: GoogleFonts.poppins()),
             ),
           ),
           TableCell(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(widget.houseno),
+              child: Text(widget.houseno, style: GoogleFonts.poppins()),
             ),
           ),
         ]),

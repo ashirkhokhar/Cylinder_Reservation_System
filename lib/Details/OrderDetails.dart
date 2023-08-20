@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Details/OrderTable.dart';
 import 'package:flutter_application_1/Details/order_provider.dart';
@@ -57,28 +59,31 @@ class _DetailsPageState extends State<DetailsPage> {
                   const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
               children: [
                 ListTile(
-                  title: const Text('Location'),
-                  subtitle: Text(widget.selectedLocation),
+                  title: Text('Location', style: GoogleFonts.poppins()),
+                  subtitle: Text(widget.selectedLocation,
+                      style: GoogleFonts.poppins()),
                 ),
                 ListTile(
-                  title: const Text('Cylinder'),
-                  subtitle: Text(widget.selectedCylinder),
+                  title: Text('Cylinder', style: GoogleFonts.poppins()),
+                  subtitle: Text(widget.selectedCylinder,
+                      style: GoogleFonts.poppins()),
                 ),
                 ListTile(
-                  title: const Text('Quantity'),
-                  subtitle: Text(widget.selectedQuantity),
+                  title: Text('Quantity', style: GoogleFonts.poppins()),
+                  subtitle: Text(widget.selectedQuantity,
+                      style: GoogleFonts.poppins()),
                 ),
                 ListTile(
-                  title: const Text('Sector'),
-                  subtitle: Text(widget.sector),
+                  title: Text('Sector', style: GoogleFonts.poppins()),
+                  subtitle: Text(widget.sector, style: GoogleFonts.poppins()),
                 ),
                 ListTile(
-                  title: const Text('Street'),
-                  subtitle: Text(widget.street),
+                  title: Text('Street', style: GoogleFonts.poppins()),
+                  subtitle: Text(widget.street, style: GoogleFonts.poppins()),
                 ),
                 ListTile(
-                  title: const Text('House No'),
-                  subtitle: Text(widget.houseNo),
+                  title: Text('House No', style: GoogleFonts.poppins()),
+                  subtitle: Text(widget.houseNo, style: GoogleFonts.poppins()),
                 ),
                 const SizedBox(height: 20),
                 Padding(
@@ -124,21 +129,27 @@ class _DetailsPageState extends State<DetailsPage> {
                       });
                     },
                     child: Container(
-                      width: 300,
-                      padding: const EdgeInsets.all(15),
+                      height: 50,
+                      margin: const EdgeInsets.symmetric(horizontal: 50),
                       decoration: BoxDecoration(
-                        color: Colors.deepPurple[300],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          'Ok',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
-                        ),
+                          borderRadius: BorderRadius.circular(50),
+                          color: Colors.deepPurple[300]),
+                      child: Center(
+                        child: _isLoading
+                            ? Container(
+                                width: 24, // Adjust the size as needed
+                                height: 24, // Adjust the size as needed
+                                child: const CircularProgressIndicator(
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                "Next",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -146,15 +157,6 @@ class _DetailsPageState extends State<DetailsPage> {
               ],
             ),
           ),
-          if (_isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.6),
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: Colors.deepPurple,
-                ),
-              ),
-            ),
         ],
       ),
     );

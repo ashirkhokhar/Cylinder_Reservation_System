@@ -30,14 +30,46 @@ class OrdersRecords extends StatelessWidget {
             columns: [
               const DataColumn(
                   label: Text('Serial No')), // Serial number column
-              const DataColumn(label: Text('Location')),
-              const DataColumn(label: Text('Cylinder')),
-              const DataColumn(label: Text('Quantity')), // Status column
-              const DataColumn(label: Text('Sector')),
-              const DataColumn(label: Text('House No')),
-              const DataColumn(label: Text('Street')),
-              const DataColumn(label: Text('Phone No')),
-              const DataColumn(label: Text('Status')),
+              DataColumn(
+                  label: Text(
+                'Location',
+                style: GoogleFonts.poppins(),
+              )),
+              DataColumn(
+                  label: Text(
+                'Cylinder',
+                style: GoogleFonts.poppins(),
+              )),
+              DataColumn(
+                  label: Text(
+                'Quantity',
+                style: GoogleFonts.poppins(),
+              )), // Status column
+              DataColumn(
+                  label: Text(
+                'Sector',
+                style: GoogleFonts.poppins(),
+              )),
+              DataColumn(
+                  label: Text(
+                'House No',
+                style: GoogleFonts.poppins(),
+              )),
+              DataColumn(
+                  label: Text(
+                'Street',
+                style: GoogleFonts.poppins(),
+              )),
+              DataColumn(
+                  label: Text(
+                'Phone No',
+                style: GoogleFonts.poppins(),
+              )),
+              DataColumn(
+                  label: Text(
+                'Status',
+                style: GoogleFonts.poppins(),
+              )),
               // Display Timestamp
             ],
             rows: orderProvider.orders.asMap().entries.map((entry) {
@@ -45,17 +77,44 @@ class OrdersRecords extends StatelessWidget {
               final order = entry.value;
               return DataRow(
                 cells: [
-                  DataCell(Text('$index')), // Display serial number
-                  DataCell(Text(order.selectedLocation)),
-                  DataCell(Text(order.selectedCylinder)),
-                  DataCell(Text(order.selectedQuantity)),
-                  DataCell(Text(order.sector)),
-                  DataCell(Text(order.houseNo)),
-                  DataCell(Text(order.street)),
-                  DataCell(Text(order.phoneNumber)),
+                  DataCell(Text(
+                    '$index',
+                    style: GoogleFonts.poppins(),
+                  )), // Display serial number
+                  DataCell(Text(
+                    order.selectedLocation,
+                    style: GoogleFonts.poppins(),
+                  )),
+                  DataCell(Text(
+                    order.selectedCylinder,
+                    style: GoogleFonts.poppins(),
+                  )),
+                  DataCell(Text(
+                    order.selectedQuantity,
+                    style: GoogleFonts.poppins(),
+                  )),
+                  DataCell(Text(
+                    order.sector,
+                    style: GoogleFonts.poppins(),
+                  )),
+                  DataCell(Text(
+                    order.houseNo,
+                    style: GoogleFonts.poppins(),
+                  )),
+                  DataCell(Text(
+                    order.street,
+                    style: GoogleFonts.poppins(),
+                  )),
+                  DataCell(Text(
+                    order.phoneNumber,
+                    style: GoogleFonts.poppins(),
+                  )),
 
                   // Display Timestamp
-                  DataCell(Text('Pending')),
+                  DataCell(Text(
+                    'Pending',
+                    style: GoogleFonts.poppins(),
+                  )),
                 ],
               );
             }).toList(),
