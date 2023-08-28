@@ -19,8 +19,23 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class AdminPanel extends StatelessWidget {
+class AdminPanel extends StatefulWidget {
   const AdminPanel({Key? key}) : super(key: key);
+
+  @override
+  State<AdminPanel> createState() => _AdminPanelState();
+}
+
+class _AdminPanelState extends State<AdminPanel> {
+  OrderSortType _currentSortType = OrderSortType.Ascending;
+
+  void _toggleSortType() {
+    setState(() {
+      _currentSortType = _currentSortType == OrderSortType.Ascending
+          ? OrderSortType.Descending
+          : OrderSortType.Ascending;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +47,39 @@ class AdminPanel extends StatelessWidget {
         backgroundColor: Colors.grey[300],
         appBar: AppBar(
           backgroundColor: Colors.deepPurple[300],
-          title: Text("Admin Panel",
-              style: GoogleFonts.bebasNeue(fontSize: 30, color: Colors.white)),
+          title: Row(
+            //crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Spacer(),
+              SizedBox(
+                width: 40,
+              ),
+              Text(
+                "Admin Panel",
+                style: GoogleFonts.bebasNeue(
+                  fontSize: 30,
+                  color: Colors.white,
+                ),
+              ),
+              Spacer(), // This will push the following widget to the end
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.lightbulb,
+                      color: _currentSortType == OrderSortType.Ascending
+                          ? Colors.yellow
+                          : Colors.white,
+                    ),
+                    onPressed: _toggleSortType,
+                  ),
+                ],
+              ),
+            ],
+          ),
           automaticallyImplyLeading: false,
           centerTitle: true,
           shape: const RoundedRectangleBorder(
@@ -42,7 +88,7 @@ class AdminPanel extends StatelessWidget {
             ),
           ),
         ),
-        body: const AllOrdersList(),
+        body: AllOrdersList(currentSortType: _currentSortType),
       ),
     );
   }
@@ -87,10 +133,20 @@ class AdminPanel extends StatelessWidget {
 }
 
 class AllOrdersList extends StatefulWidget {
-  const AllOrdersList({Key? key});
+  final OrderSortType currentSortType;
+
+  const AllOrdersList({
+    Key? key,
+    required this.currentSortType,
+  }) : super(key: key);
 
   @override
   State<AllOrdersList> createState() => _AllOrdersListState();
+}
+
+enum OrderSortType {
+  Ascending,
+  Descending,
 }
 
 class _AllOrdersListState extends State<AllOrdersList> {
@@ -98,6 +154,8 @@ class _AllOrdersListState extends State<AllOrdersList> {
   String _searchText = "";
   List<String> _newOrders = [];
   late SharedPreferences _preferences;
+  String _selectedStatus = "";
+  OrderSortType _currentSortType = OrderSortType.Ascending; // Add this line
 
   @override
   void initState() {
@@ -245,7 +303,12 @@ class _AllOrdersListState extends State<AllOrdersList> {
                     parseOrderTimestamp(a['orderTimestamp'] as Timestamp);
                 final timestampB =
                     parseOrderTimestamp(b['orderTimestamp'] as Timestamp);
-                return timestampA.compareTo(timestampB);
+
+                if (widget.currentSortType == OrderSortType.Ascending) {
+                  return timestampA.compareTo(timestampB);
+                } else {
+                  return timestampB.compareTo(timestampA);
+                }
               });
 
               if (filteredOrders.isEmpty) {
@@ -297,7 +360,7 @@ class _AllOrdersListState extends State<AllOrdersList> {
                           trailing: status == 'New'
                               ? Container(
                                   decoration: BoxDecoration(
-                                    color: Colors.deepPurple[300],
+                                    color: Colors.deepPurple,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   padding: const EdgeInsets.symmetric(
@@ -306,15 +369,15 @@ class _AllOrdersListState extends State<AllOrdersList> {
                                     'New',
                                     style: GoogleFonts.poppins(
                                       color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
+                                      //fontWeight: FontWeight.bold,
+                                      fontSize: 15,
                                     ),
                                   ),
                                 )
                               : status == 'Pending'
                                   ? Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.yellow[700],
+                                        color: Colors.yellow[800],
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       padding: const EdgeInsets.symmetric(
@@ -323,8 +386,8 @@ class _AllOrdersListState extends State<AllOrdersList> {
                                         'Pending',
                                         style: GoogleFonts.poppins(
                                           color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
+                                          //fontWeight: FontWeight.bold,
+                                          fontSize: 15,
                                         ),
                                       ),
                                     )

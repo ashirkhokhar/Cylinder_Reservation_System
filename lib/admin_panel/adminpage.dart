@@ -168,7 +168,7 @@ class _adminloginState extends State<adminlogin> {
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => const AdminPanel(),
+                                    builder: (context) => AdminPanel(),
                                   ),
                                 );
                               });
